@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 public class TicTacToe implements ActionListener {
     int altNum = 0; // this number enables alternate choices between an 'x' and an 'o' for various clicks
+    Board board;
     int size = 3;
     int area = 9;
     JButton[] buttons;
@@ -34,6 +35,7 @@ public class TicTacToe implements ActionListener {
         
         JButton buttonClicked = (JButton) event.getSource(); // get source of clicks, an object will be returned, so casting is needed
         int playAgain = 10; // playAgain will store the user choice on whether a new game takes place
+
         if (this.altNum % 2 == 0 && buttonClicked.getText().equals(" ") && !gameEnds()) { 
             buttonClicked.setText("X"); // the empty string option above is needed, if clicking on an already
             altNum++; // clicked square is to cause nothing
@@ -43,6 +45,7 @@ public class TicTacToe implements ActionListener {
                 altNum++;
             } 
         }
+
         if (gameEnds()) { // if the game has ended
               if (altNum < area) { // before reaching 9 moves, someone has won
                   playAgain = JOptionPane.showConfirmDialog(null, marker + " wins! Do you want to play again?", marker + "won!", JOptionPane.YES_NO_OPTION); 
@@ -114,13 +117,14 @@ public class TicTacToe implements ActionListener {
 
         this.size = size;
         area = size * size;
+        board = new Board(size);
 
         buttons = new JButton[area]; // create an array of size^2 buttons
 
     }
 
     public static void main(String[] args) {
-        TicTacToe aGame = new TicTacToe(5);
+        TicTacToe aGame = new TicTacToe(3);
         aGame.setButtons();
     }
 }

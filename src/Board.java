@@ -1,16 +1,5 @@
 import java.util.ArrayList;
 
-public class Structures {
-
-    public static void main(String[] args){
-
-        Board board = new Board(3);
-        System.out.println(board);
-
-    }
-
-}
-
 //A is default
 //O is player
 //X is computer
@@ -46,6 +35,8 @@ class Tile{
             System.out.println("Can't set tile at " + x + " " + y);
 
         this.status = status;
+        for(Row row : rows)
+            row.UpdateScore(status);
 
     }
 
@@ -72,17 +63,44 @@ class Tile{
 class Row{
 
     private Tile[] tiles;
-    private int score, absScore;
+    private int score, absScore, target;
 
     public Row(Tile[] tiles){
 
         this.tiles = tiles;
         score = 0; //negative if more X, positive if more O
         absScore = 0; //total number of tiles claimed
+        target = tiles.length; //how many tiles of the same type necessary for win condition
 
         //the tiles in the row will know that they are a member of this row
         for(Tile tile : tiles)
             tile.JoinRow(this);
+
+    }
+
+    //whether this tile is still winnable
+    //  if Math.abs(score) != absScore, this means that there are tiles of different types
+    //  therefore it is not possible to win on this row anymore
+    //  EX. a tile with two Xs and one O has a score of -1 and an abs. score of 3
+    public boolean winnable(){
+
+        return Math.abs(score) != absScore;
+
+    }
+
+    //if a player has won a row, the row must be winnable (ie. only one type of tile present)
+    //  and it must have number of claimed tiles equal to the total number of tiles
+
+    //  if the score is negative, X wins
+    //  else if score is positive, O wins
+    //  if row isn't won at all, return A as the default
+    public Status winner(){
+
+        //only proceed if conditions are met
+        if(!(winnable() && absScore == target))
+            return Status.A;
+
+        return score > 0 ? Status.O : Status.X;
 
     }
 
@@ -96,9 +114,25 @@ class Row{
 
     }
 
+    void UpdateScore(Status player){
+
+        absScore++;
+        switch (player){
+
+            case O:
+                score++;
+                break;
+            case X:
+                score--;
+                break;
+
+        }
+
+    }
+
 }
 
-class Board{
+public class Board{
 
     private int size;
     public Tile[][] tiles;
