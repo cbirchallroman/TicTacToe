@@ -36,7 +36,7 @@ class Tile{
 
         this.status = status;
         for(Row row : rows)
-            row.UpdateScore(status);
+            row.updateScore(status);
 
     }
 
@@ -114,15 +114,15 @@ class Row{
 
     }
 
-    void UpdateScore(Status player){
+    void updateScore(Status player){
 
-        absScore++;
+        absScore++; //increase absolute score by 1
         switch (player){
 
-            case O:
+            case O: //O increases score
                 score++;
                 break;
-            case X:
+            case X: //X decreases score
                 score--;
                 break;
 
