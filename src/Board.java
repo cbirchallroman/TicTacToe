@@ -52,9 +52,15 @@ class Tile{
 
     }
 
-    public void JoinRow(Row row){
+    void JoinRow(Row row){
 
         rows.add(row);
+
+    }
+
+    void Reset(){
+
+        status = Status.A;
 
     }
 
@@ -130,6 +136,13 @@ class Row{
 
     }
 
+    void Reset(){
+
+        score = 0;
+        absScore = 0;
+
+    }
+
 }
 
 public class Board{
@@ -196,7 +209,16 @@ public class Board{
     //returns O if O wins
     //returns X if X wins
     //returns A if no winner
-    public Status Winner(){
+    public Status winner(){
+
+        Status w = Status.A;
+
+        //if there is a winner on any of the rows
+        for(Row row : rows)
+            if(row.winner() != Status.A){
+                w = row.winner();
+                break;
+            }
 
         return Status.A;
 
@@ -215,6 +237,15 @@ public class Board{
         }
 
         return s;
+
+    }
+
+    public void reset(){
+
+        for(Row row : rows)
+            row.Reset();
+
+
 
     }
 

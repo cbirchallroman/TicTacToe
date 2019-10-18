@@ -66,9 +66,13 @@ public class TicTacToe implements ActionListener {
         
     }
     public void clearButtons() {
+
         for (int i = 0; i < area; i++) {
             buttons[i].setText(" "); // reset the buttons to empty
         }
+
+        board.reset();
+
         altNum = 0; // reset altnum to zero
     }
     public boolean gameEnds() {
