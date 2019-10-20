@@ -56,7 +56,7 @@ public class TicTacToe implements ActionListener {
         System.out.println(board);
 
         if (gameEnds()) { // if the game has ended
-              if (altNum < area) { // before reaching 9 moves, someone has won
+              if (marker != null) { // before reaching 9 moves, someone has won
                   playAgain = JOptionPane.showConfirmDialog(null, marker + " wins! Do you want to play again?", marker + "won!", JOptionPane.YES_NO_OPTION); 
               } else {// otherwise the game is a draw
                 playAgain = JOptionPane.showConfirmDialog(null, " The game is a draw! Do you want to play again?", "Draw!", JOptionPane.YES_NO_OPTION); 
@@ -85,6 +85,7 @@ public class TicTacToe implements ActionListener {
         board.reset();
 
         altNum = 0; // reset altnum to zero
+        marker = null;
     }
     public boolean gameEnds() {
 
@@ -97,6 +98,7 @@ public class TicTacToe implements ActionListener {
 
         // if <area> moves have been reached the game ends in a draw
         if (board.noMovesLeft()) {
+            marker = null;
             return true;
         }
         // otherwise the game is still afoot
@@ -109,9 +111,11 @@ public class TicTacToe implements ActionListener {
         this.size = size;
         area = size * size;
         board = new Board(size);
+        altNum = 0;
 
         buttons = new JButton[size][size]; // create an array of size^2 buttons
         tilesDict = new HashMap<>();
+        marker = null;
 
     }
 
