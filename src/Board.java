@@ -40,8 +40,13 @@ public class Board{
 
             this.status = status;
             board.incrementTotalScore();
-            for(Row row : rows)
+            for(Row row : rows){
                 row.updateScore(status);
+
+                //if this move is a winning move, declare the player the winner
+                if(row.winner() == status)
+                    board.declareWinner(this);
+            }
 
         }
 
@@ -154,6 +159,7 @@ public class Board{
     private int area;
     private int totalScore;
     private boolean winnable;
+    public Status winner;
     public Tile[][] tiles;
     public Row[] rows;
 
@@ -165,6 +171,7 @@ public class Board{
         winnable = true;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
         rows = new Row[size * 2 + 2];   //board of size 3 has 8 winning combinations
+        winner = Status.A;
 
         for(int i = 0; i < size; i ++){
 
@@ -221,33 +228,6 @@ public class Board{
 
     }
 
-    //returns O if O wins
-    //returns X if X wins
-    //returns A if no winner
-    public Status winner(){
-
-        //this function also keeps track of whether the game is still winnable (regardless of empty spaces)
-        boolean winnable = false;
-
-        //if there is a winner on any of the rows, return that one
-        for(Row row : rows){
-            Status winner = row.winner();
-            System.out.println(row + " " + winner.name() + " " + row.score);
-            if(winner != Status.A)
-                return winner;
-            else if(row.winnable())
-                winnable = true;
-        }
-
-        //winnable?
-        this.winnable = winnable;
-
-        return Status.A;
-
-    }
-
-    //
-
     //prints status of board
     public String toString(){
 
@@ -264,6 +244,16 @@ public class Board{
 
     }
 
+    //returns O if O wins
+    //returns X if X wins
+    //returns A if no winner
+    void declareWinner(Tile tile){
+
+        winner = tile.status;
+        System.out.println(winner.name() + " wins");
+
+    }
+
     public void reset(){
 
         for(Row row : rows)
@@ -275,6 +265,7 @@ public class Board{
 
         totalScore = 0;
         winnable = true;
+        winner = Status.A;
 
     }
 

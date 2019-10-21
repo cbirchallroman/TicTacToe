@@ -92,9 +92,8 @@ public class TicTacToe implements ActionListener {
     public boolean gameEnds() {
 
         //if the board detects a winner
-        Status winner = board.winner();
-        if(winner != Status.A) {
-            marker = winner.name();
+        if(board.winner != Status.A) {
+            marker = board.winner.name();
             return true;
         }
 
