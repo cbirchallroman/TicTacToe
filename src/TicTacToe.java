@@ -51,6 +51,7 @@ public class TicTacToe implements ActionListener {
         Status claim = this.altNum % 2 == 0 ? Status.X : Status.O;
         tile.Set(claim);
         buttonClicked.setText(claim.name());
+        buttonClicked.setBackground(Color.lightGray);
         altNum++;
 
         System.out.println(board);
@@ -79,6 +80,7 @@ public class TicTacToe implements ActionListener {
         for (int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++){
                 buttons[i][j].setText(" "); // reset the buttons to empty
+                buttons[i][j].setBackground(buttons[i][j].getForeground());
             }
         }
 
@@ -137,10 +139,10 @@ public class TicTacToe implements ActionListener {
                 aGame.setButtons();
             }
           
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(frame, "You entered irregular input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
-                System.exit(0);
-            }       
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "You entered irregular input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }       
         
     
     }
