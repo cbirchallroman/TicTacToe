@@ -6,13 +6,13 @@ import java.awt.event.ActionListener;
 import java.util.*; //needed for map
 
 public class TicTacToe implements ActionListener {
-    int altNum = 0; // this number enables alternate choices between an 'x' and an 'o' for various clicks
+    int altNum; // this number enables alternate choices between an 'x' and an 'o' for various clicks
     Board board;
-    int size = 3;
-    int area = 9;
+    int size;
+    int area;
     JButton[][] buttons;
     HashMap<JButton, Board.Tile> tilesDict;
-    String marker = " "; // initialize the marker, an 'x' or an 'o' to null
+    String marker; // initialize the marker, an 'x' or an 'o' to null
 
     public void setButtons() {
 
@@ -120,7 +120,28 @@ public class TicTacToe implements ActionListener {
     }
 
     public static void main(String[] args) {
-        TicTacToe aGame = new TicTacToe(3);
-        aGame.setButtons();
+
+        JFrame frame = new JFrame();
+        
+        try {
+            
+            String gridSize = JOptionPane.showInputDialog(frame, "Enter the size of the grid (3, 4 or 5 accepted): ");
+            int size = Integer.parseInt(gridSize);
+          
+            if (size < 3 || 5 < size) {
+                JOptionPane.showMessageDialog(frame, "The number you entered doesn't satisfy acceptable values. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
+                System.exit(0);
+            } else {
+                TicTacToe aGame = new TicTacToe(size);
+                aGame = new TicTacToe(Integer.parseInt(gridSize));
+                aGame.setButtons();
+            }
+          
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(frame, "You entered irregular input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
+                System.exit(0);
+            }       
+        
+    
     }
 }
