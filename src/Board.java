@@ -40,7 +40,9 @@ public class Board{
 
             this.status = status;
             board.incrementTotalScore();
-            for(Row row : rows){
+            for(int i = rows.size() - 1; i >= 0; i--){
+
+                Row row = rows.get(i);
                 row.updateScore(status);
 
                 //if this move is a winning move, declare the player the winner
@@ -69,6 +71,12 @@ public class Board{
         void JoinRow(Row row){
 
             rows.add(row);
+
+        }
+
+        public void leaveRow(Row row){
+
+            rows.remove(row);
 
         }
 
@@ -149,10 +157,9 @@ public class Board{
         public void leave(){
 
             for(Tile tile : tiles)
-                tile.rows.remove(this);
+                tile.leaveRow(this);
 
-            board.rows.remove(this);
-
+            board.disqualifyRow(this);
         }
 
     }
@@ -253,6 +260,12 @@ public class Board{
 
         winner = tile.status;
         System.out.println(winner.name() + " wins");
+
+    }
+
+    void disqualifyRow(Row row){
+
+        rows.remove(row);
 
     }
 
