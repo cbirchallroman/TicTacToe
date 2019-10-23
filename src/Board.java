@@ -82,7 +82,7 @@ public class Board{
 
     }
 
-    class Row{
+    class Row implements Comparable{
 
         Board board;
         private Tile[] tiles;
@@ -135,6 +135,12 @@ public class Board{
                 s += "(" + tile.coordinates() + ") ";
 
             return s;
+
+        }
+
+        public int compareTo(Object other){
+
+            return this.score - ((Row)other).score;
 
         }
 
