@@ -176,7 +176,7 @@ public class Board{
     private boolean winnable;
     public Status winner;
     public Tile[][] tiles;
-    public ArrayList<Row> rows;
+    public DoublePriorityQueue<Row> rows;
 
     public Board(int size){
 
@@ -185,7 +185,7 @@ public class Board{
         totalScore = 0;
         winnable = true;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
-        rows = new ArrayList<>(size * 2 + 2);   //board of size 3 has 8 winning combinations
+        rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = Status.A;
 
         for(int i = 0; i < size; i ++){
