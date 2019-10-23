@@ -98,7 +98,7 @@ public class TicTacToe implements ActionListener {
         }
 
         // if <area> moves have been reached the game ends in a draw
-        if (board.noMovesLeft()) {
+        if (board.noMoreTiles()) {
             marker = null;
             return true;
         }

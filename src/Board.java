@@ -68,7 +68,7 @@ public class Board{
 
         }
 
-        void JoinRow(Row row){
+        void joinRow(Row row){
 
             rows.add(row);
 
@@ -98,7 +98,7 @@ public class Board{
 
             //the tiles in the row will know that they are a member of this row
             for(Tile tile : tiles)
-                tile.JoinRow(this);
+                tile.joinRow(this);
 
         }
 
@@ -277,6 +277,7 @@ public class Board{
 
     public int getTotalScore(){ return totalScore; }
     public void incrementTotalScore(){ totalScore++; }
-    public boolean noMovesLeft(){ return totalScore == area; }
+    public boolean noMoreTiles(){ return totalScore == area; }
+    public boolean winnable(){ return rows.size() > 0; }
 
 }
