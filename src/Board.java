@@ -46,6 +46,10 @@ public class Board{
                 //if this move is a winning move, declare the player the winner
                 if(row.winner() == status)
                     board.declareWinner(this);
+
+                //else if this row is no longer winnable, make it remove itself from its tiles and the board
+                else if(!row.winnable())
+                    row.leave();
             }
 
         }
@@ -68,22 +72,18 @@ public class Board{
 
         }
 
-        void reset(){
-
-            status = Status.A;
-
-        }
-
     }
 
     class Row{
 
+        Board board;
         private Tile[] tiles;
         private int score, absScore, target;
 
-        public Row(Tile[] tiles){
+        public Row(Tile[] tiles, Board board){
 
             this.tiles = tiles;
+            this.board = board;
             score = 0; //negative if more X, positive if more O
             absScore = 0; //total number of tiles claimed
             target = tiles.length; //how many tiles of the same type necessary for win condition
@@ -100,7 +100,7 @@ public class Board{
         //  EX. a tile with two Xs and one O has a score of -1 and an abs. score of 3
         public boolean winnable(){
 
-            return Math.abs(score) != absScore && absScore < target;
+            return Math.abs(score) == absScore;
 
         }
 
@@ -146,10 +146,12 @@ public class Board{
 
         }
 
-        void reset(){
+        public void leave(){
 
-            score = 0;
-            absScore = 0;
+            for(Tile tile : tiles)
+                tile.rows.remove(this);
+
+            board.rows.remove(this);
 
         }
 
@@ -161,7 +163,7 @@ public class Board{
     private boolean winnable;
     public Status winner;
     public Tile[][] tiles;
-    public Row[] rows;
+    public ArrayList<Row> rows;
 
     public Board(int size){
 
@@ -170,7 +172,7 @@ public class Board{
         totalScore = 0;
         winnable = true;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
-        rows = new Row[size * 2 + 2];   //board of size 3 has 8 winning combinations
+        rows = new ArrayList<>(size * 2 + 2);   //board of size 3 has 8 winning combinations
         winner = Status.A;
 
         for(int i = 0; i < size; i ++){
@@ -186,7 +188,7 @@ public class Board{
 
             }
 
-            rows[i] = new Row(rowTiles);
+            rows.add(new Row(rowTiles, this));
 
         }
 
@@ -196,7 +198,7 @@ public class Board{
             Tile[] columnTiles = new Tile[size];
             for(int i = 0; i < size; i++)
                 columnTiles[i] = tiles[i][j];
-            rows[size + j] = new Row(columnTiles);
+            rows.add(new Row(columnTiles, this));
 
         }
 
@@ -209,8 +211,8 @@ public class Board{
             diagonal_b[k] = tiles[k][opposite];
         }
 
-        rows[size + size] = new Row(diagonal_a);
-        rows[size + size + 1] = new Row(diagonal_b);
+        rows.add(new Row(diagonal_a, this));
+        rows.add(new Row(diagonal_b, this));
 
     }
 
@@ -240,7 +242,7 @@ public class Board{
 
         }
 
-        return s;
+        return s + " (" + rows.size() + " rows)";
 
     }
 
@@ -251,21 +253,6 @@ public class Board{
 
         winner = tile.status;
         System.out.println(winner.name() + " wins");
-
-    }
-
-    public void reset(){
-
-        for(Row row : rows)
-            row.reset();
-
-        for(Tile[] row : tiles)
-            for(Tile tile : row)
-                tile.reset();
-
-        totalScore = 0;
-        winnable = true;
-        winner = Status.A;
 
     }
 

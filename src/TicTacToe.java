@@ -84,7 +84,7 @@ public class TicTacToe implements ActionListener {
             }
         }
 
-        board.reset();
+        board = new Board(size);
 
         altNum = 0; // reset altnum to zero
         marker = null;
