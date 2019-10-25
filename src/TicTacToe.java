@@ -12,7 +12,6 @@ public class TicTacToe implements ActionListener {
     int area;
     JButton[][] buttons;
     HashMap<JButton, Board.Tile> tilesDict;
-    char marker; // initialize the marker, an 'x' or an 'o' to null
 
     public void setButtons() {
 
@@ -56,9 +55,9 @@ public class TicTacToe implements ActionListener {
 
         System.out.println(board);
 
-        if (gameEnds()) { // if the game has ended
-              if (marker != ' ') { // before reaching 9 moves, someone has won
-                  playAgain = JOptionPane.showConfirmDialog(null, marker + " wins! Do you want to play again?", marker + "won!", JOptionPane.YES_NO_OPTION); 
+        if (board.gameOver()) { // if the game has ended
+              if (board.winner != ' ') { // before reaching 9 moves, someone has won
+                  playAgain = JOptionPane.showConfirmDialog(null, board.winner + " wins! Do you want to play again?", board.winner + "won!", JOptionPane.YES_NO_OPTION);
               } else {// otherwise the game is a draw
                 playAgain = JOptionPane.showConfirmDialog(null, " The game is a draw! Do you want to play again?", "Draw!", JOptionPane.YES_NO_OPTION); 
               }
@@ -87,24 +86,6 @@ public class TicTacToe implements ActionListener {
         board = new Board(size);
 
         altNum = 0; // reset altnum to zero
-        marker = ' ';
-    }
-    public boolean gameEnds() {
-
-        //if the board detects a winner
-        if(board.winner != ' ') {
-            marker = board.winner;
-            return true;
-        }
-
-        // if <area> moves have been reached the game ends in a draw
-        if (board.noMoreTiles()) {
-            marker = ' ';
-            return true;
-        }
-        // otherwise the game is still afoot
-        return false;
-        
     }
 
     public TicTacToe(int size){
@@ -116,7 +97,6 @@ public class TicTacToe implements ActionListener {
 
         buttons = new JButton[size][size]; // create an array of size^2 buttons
         tilesDict = new HashMap<>();
-        marker = ' ';
 
     }
 

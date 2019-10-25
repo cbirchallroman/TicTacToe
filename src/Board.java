@@ -274,5 +274,6 @@ public class Board{
     public void incrementTotalScore(){ totalScore++; }
     public boolean noMoreTiles(){ return totalScore == area; }
     public boolean winnable(){ return rows.size() > 0; }
+    public boolean gameOver(){ return winner != ' ' || noMoreTiles(); } //game over if winner or no more tiles
 
 }
