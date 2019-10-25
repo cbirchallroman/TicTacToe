@@ -1,10 +1,5 @@
 import java.util.ArrayList;
 
-//A is default
-//O is player
-//X is computer
-enum Status{O, X, A}
-
 public class Board{
 
     class Tile{
@@ -14,14 +9,14 @@ public class Board{
         private Tile[] tiles;
         private ArrayList<Row> rows;
         private Board board;
-        private Status status;
+        private char status;
 
         public Tile(int x, int y, Board board){
 
             this.x = x;
             this.y = y;
             this.board = board;
-            status = Status.A;
+            status = ' ';
             rows = new ArrayList<>();
 
         }
@@ -32,8 +27,8 @@ public class Board{
 
         }
 
-        public boolean Open(){ return status == Status.A;}
-        public void Set(Status status){
+        public boolean Open(){ return status == ' ';}
+        public void Set(char status){
 
             if(!Open())
                 System.out.println("Can't set tile at " + x + " " + y);
@@ -64,7 +59,7 @@ public class Board{
 
         public String toString(){
 
-            return "[" + (status == Status.A ? ' ' : status) + "]";
+            return "[" + status + "]";
 
         }
 
@@ -118,13 +113,13 @@ public class Board{
         //  if the score is negative, X wins
         //  else if score is positive, O wins
         //  if row isn't won at all, return A as the default
-        public Status winner(){
+        public char winner(){
 
             //only proceed if conditions are met
             if(Math.abs(score) != target)
-                return Status.A;
+                return ' ';
 
-            return score > 0 ? Status.O : Status.X;
+            return score > 0 ? 'O' : 'X';
 
         }
 
@@ -144,15 +139,15 @@ public class Board{
 
         }
 
-        void updateScore(Status player){
+        void updateScore(char player){
 
             absScore++; //increase absolute score by 1
             switch (player){
 
-                case O: //O increases score
+                case 'O': //O increases score
                     score++;
                     break;
-                case X: //X decreases score
+                case 'X': //X decreases score
                     score--;
                     break;
 
@@ -174,7 +169,7 @@ public class Board{
     private int area;
     private int totalScore;
     private boolean winnable;
-    public Status winner;
+    public char winner;
     public Tile[][] tiles;
     public DoublePriorityQueue<Row> rows;
 
@@ -186,7 +181,7 @@ public class Board{
         winnable = true;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
-        winner = Status.A;
+        winner = ' ';
 
         for(int i = 0; i < size; i ++){
 
@@ -265,7 +260,7 @@ public class Board{
     void declareWinner(Tile tile){
 
         winner = tile.status;
-        System.out.println(winner.name() + " wins");
+        System.out.println("Player " + winner + " wins");
 
     }
 
