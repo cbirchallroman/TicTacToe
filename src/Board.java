@@ -46,7 +46,7 @@ public class Board{
 
                 //else if this row is no longer winnable, make it remove itself from its tiles and the board
                 else if(!row.winnable())
-                    row.leave();
+                    row.disqualify();
             }
 
         }
@@ -72,6 +72,23 @@ public class Board{
         public void leaveRow(Row row){
 
             rows.remove(row);
+
+        }
+
+        //returns number of rows eliminated if given player claims this tile
+        public int rowsCanEliminate(char player){
+
+            int score = 0;
+
+            for(Row row : rows){
+                char other = row.winner();
+                if(row.winner() != ' ')
+                    continue;
+                if(row.winner() != player)
+                    score++;
+            }
+
+            return score;
 
         }
 
@@ -139,6 +156,24 @@ public class Board{
 
         }
 
+        //returns the tile with the most possible rows for this player to eliminate
+        public Tile tileWithMostDisqualifications(char player){
+
+            Tile most = null;
+            int score = 0;
+            for(Tile tile : tiles){
+
+                int localScore = tile.rowsCanEliminate(player);
+                if(localScore > score){
+                    most = tile;
+                    score = localScore;
+                }
+
+            }
+            return most;
+
+        }
+
         void updateScore(char player){
 
             absScore++; //increase absolute score by 1
@@ -155,7 +190,7 @@ public class Board{
 
         }
 
-        public void leave(){
+        public void disqualify(){
 
             for(Tile tile : tiles)
                 tile.leaveRow(this);
