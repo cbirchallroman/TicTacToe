@@ -6,7 +6,6 @@ public class Board{
 
         private int x;
         private int y;
-        private Tile[] tiles;
         private ArrayList<Row> rows;
         private Board board;
         private char status;
@@ -18,12 +17,6 @@ public class Board{
             this.board = board;
             status = ' ';
             rows = new ArrayList<>();
-
-        }
-
-        public void SetNeighbors(Tile[] tiles){
-
-            this.tiles = tiles;
 
         }
 
@@ -82,9 +75,9 @@ public class Board{
 
             for(Row row : rows){
                 char other = row.winner();
-                if(row.winner() != ' ')
+                if(other != ' ')
                     continue;
-                if(row.winner() != player)
+                if(other != player)
                     score++;
             }
 
@@ -94,7 +87,7 @@ public class Board{
 
     }
 
-    class Row implements Comparable{
+    class Row implements Comparable<Row>{
 
         Board board;
         private Tile[] tiles;
@@ -150,7 +143,7 @@ public class Board{
 
         }
 
-        public int compareTo(Object other){
+        public int compareTo(Row other){
 
             return this.score - ((Row)other).score;
 
@@ -203,7 +196,6 @@ public class Board{
     private int size;
     private int area;
     private int totalScore;
-    private boolean winnable;
     public char winner;
     public Tile[][] tiles;
     public DoublePriorityQueue<Row> rows;
@@ -213,7 +205,6 @@ public class Board{
         this.size = size;
         area = size * size;
         totalScore = 0;
-        winnable = true;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = ' ';
