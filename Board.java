@@ -8,25 +8,25 @@ public class Board{
         private int y;
         private ArrayList<Row> rows;
         private Board board;
-        private char status;
+        private char claimer;
 
         public Tile(int x, int y, Board board){
 
             this.x = x;
             this.y = y;
             this.board = board;
-            status = ' ';
+            claimer = ' ';
             rows = new ArrayList<>();
 
         }
 
-        public boolean Open(){ return status == ' ';}
+        public boolean Open(){ return claimer == ' ';}
         public void Set(char status){
 
             if(!Open())
                 System.out.println("Can't set tile at " + x + " " + y);
 
-            this.status = status;
+            this.claimer = status;
             board.incrementTotalScore();
             for(int i = rows.size() - 1; i >= 0; i--){
 
@@ -34,12 +34,8 @@ public class Board{
                 row.updateScore(status);
 
                 //if this move is a winning move, declare the player the winner
-                if(row.winner() == status)
+                if(row.won())
                     board.declareWinner(this);
-
-                //else if this row is no longer winnable, make it remove itself from its tiles and the board
-                else if(!row.winnable())
-                    row.disqualify();
             }
 
         }
@@ -52,7 +48,7 @@ public class Board{
 
         public String toString(){
 
-            return "[" + status + "]";
+            return "[" + claimer + "]";
 
         }
 
@@ -92,6 +88,7 @@ public class Board{
         Board board;
         private Tile[] tiles;
         private int score, absScore, target;
+        public char claimer = ' ';
 
         public Row(Tile[] tiles, Board board){
 
@@ -107,31 +104,8 @@ public class Board{
 
         }
 
-        //whether this tile is still winnable
-        //  if Math.abs(score) != absScore, this means that there are tiles of different types
-        //  therefore it is not possible to win on this row anymore
-        //  EX. a tile with two Xs and one O has a score of -1 and an abs. score of 3
-        public boolean winnable(){
-
-            return Math.abs(score) == absScore;
-
-        }
-
-        //if a player has won a row, the magnitude of the score must equal the target
-        //  eg. if score is -3 or 3 and target is 3, return true
-
-        //  if the score is negative, X wins
-        //  else if score is positive, O wins
-        //  if row isn't won at all, return A as the default
-        public char winner(){
-
-            //only proceed if conditions are met
-            if(Math.abs(score) != target)
-                return ' ';
-
-            return score > 0 ? 'O' : 'X';
-
-        }
+        //returns true if the score equals target; this is only possible if all tiles in row are claimed by the same player
+        public boolean won(){ return absScore == target; }
 
         public String toString(){
 
@@ -169,17 +143,20 @@ public class Board{
 
         void updateScore(char player){
 
-            absScore++; //increase absolute score by 1
-            switch (player){
-
-                case 'O': //O increases score
-                    score++;
-                    break;
-                case 'X': //X decreases score
-                    score--;
-                    break;
-
+            //if the player claiming this tile is not the same player who claimed tiles in this row before,
+            //  this row is disqualified
+            if(claimer != ' ' && claimer != player){
+                disqualify();
+                return;
             }
+
+            absScore++; //increase absolute score by 1
+            claimer = player;
+
+            if(player == board.player1)
+                score++;
+            else
+                score--;
 
         }
 
@@ -197,6 +174,8 @@ public class Board{
     private int area;
     private int totalScore;
     public char winner;
+    public char player1;
+    public char player2;
     public Tile[][] tiles;
     public DoublePriorityQueue<Row> rows;
 
@@ -208,6 +187,8 @@ public class Board{
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = ' ';
+        player1 = 'X';
+        player2 = 'O';
 
         for(int i = 0; i < size; i ++){
 
@@ -285,7 +266,7 @@ public class Board{
     //returns A if no winner
     void declareWinner(Tile tile){
 
-        winner = tile.status;
+        winner = tile.claimer;
         System.out.println("Player " + winner + " wins");
 
     }

@@ -47,7 +47,7 @@ public class TicTacToe implements ActionListener {
         if(!tile.Open())
             return;
 
-        char claim = this.altNum % 2 == 0 ? 'X' : 'O';
+        char claim = this.altNum % 2 == 0 ? board.player1 : board.player2;
         tile.Set(claim);
         buttonClicked.setText(claim + "");
         buttonClicked.setBackground(Color.lightGray);
@@ -76,14 +76,17 @@ public class TicTacToe implements ActionListener {
     }
     public void clearButtons() {
 
+        
+        board = new Board(size);
+
         for (int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++){
                 buttons[i][j].setText(" "); // reset the buttons to empty
                 buttons[i][j].setBackground(buttons[i][j].getForeground());
+                tilesDict.put(buttons[i][j], board.getTile(i, j));
             }
         }
 
-        board = new Board(size);
 
         altNum = 0; // reset altnum to zero
     }
