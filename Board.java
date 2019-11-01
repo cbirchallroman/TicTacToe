@@ -31,11 +31,8 @@ public class Board{
             for(int i = rows.size() - 1; i >= 0; i--){
 
                 Row row = rows.get(i);
-                row.updateScore(status);
+                row.claimTile(status);
 
-                //if this move is a winning move, declare the player the winner
-                if(row.won())
-                    board.declareWinner(this);
             }
 
         }
@@ -141,7 +138,7 @@ public class Board{
 
         }
 
-        void updateScore(char player){
+        void claimTile(char player){
 
             //if the player claiming this tile is not the same player who claimed tiles in this row before,
             //  this row is disqualified
@@ -157,6 +154,9 @@ public class Board{
                 score++;
             else
                 score--;
+
+            if(won())
+                board.declareWinner(player);
 
         }
 
@@ -265,9 +265,9 @@ public class Board{
     //returns O if O wins
     //returns X if X wins
     //returns A if no winner
-    void declareWinner(Tile tile){
+    void declareWinner(char winner){
 
-        winner = tile.claimer;
+        this.winner = winner;
         System.out.println("Player " + winner + " wins");
 
     }
@@ -280,7 +280,6 @@ public class Board{
 
     public int getTotalScore(){ return area - unclaimed.size(); }
     public void recordTile(Tile tile){
-        totalScore++;
         unclaimed.remove(tile);
     }
     public boolean noMoreTiles(){ return unclaimed.isEmpty(); }
