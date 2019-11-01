@@ -91,7 +91,7 @@ public class Board{
 
             this.tiles = tiles;
             this.board = board;
-            score = 0; //negative if more X, positive if more O
+            score = 0; //negative if more O, positive if more X
             absScore = 0; //total number of tiles claimed
             target = tiles.length; //how many tiles of the same type necessary for win condition
 
@@ -107,8 +107,10 @@ public class Board{
         public String toString(){
 
             String s = "";
-            for(Tile tile : tiles)
-                s += "(" + tile.coordinates() + ") ";
+            //for(Tile tile : tiles)
+            //    s += "(" + tile.coordinates() + ") ";
+            for(int i = 0; i < absScore; i++)
+                s += claimer;
 
             return s;
 
@@ -157,6 +159,7 @@ public class Board{
 
             if(won())
                 board.declareWinner(player);
+            board.updateRow(this);
 
         }
 
@@ -258,13 +261,13 @@ public class Board{
 
         }
 
-        return s + " (" + rows.size() + " rows)";
+        return s + rows.size() + " rows\t[ O: (" + rows.peek() + ")\t X: (" + rows.peekLast() + ") ]";
 
     }
 
     //returns O if O wins
     //returns X if X wins
-    //returns A if no winner
+    //returns blank if no winner
     void declareWinner(char winner){
 
         this.winner = winner;
@@ -281,6 +284,9 @@ public class Board{
     public int getTotalScore(){ return area - unclaimed.size(); }
     public void recordTile(Tile tile){
         unclaimed.remove(tile);
+    }
+    public void updateRow(Row row){
+        rows.update(row);
     }
     public boolean noMoreTiles(){ return unclaimed.isEmpty(); }
     public boolean winnable(){ return rows.size() > 0; }
