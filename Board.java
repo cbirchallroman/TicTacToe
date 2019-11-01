@@ -20,14 +20,14 @@ public class Board{
 
         }
 
-        public boolean Open(){ return claimer == ' ';}
-        public void Set(char status){
+        public boolean unclaimed(){ return claimer == ' ';}
+        public void claim(char status){
 
-            if(!Open())
+            if(!unclaimed())
                 System.out.println("Can't set tile at " + x + " " + y);
 
             this.claimer = status;
-            board.incrementTotalScore();
+            board.recordTile(this);
             for(int i = rows.size() - 1; i >= 0; i--){
 
                 Row row = rows.get(i);
@@ -172,19 +172,19 @@ public class Board{
 
     private int size;
     private int area;
-    private int totalScore;
     public char winner;
     public char player1;
     public char player2;
     public Tile[][] tiles;
+    public ArrayList<Tile> unclaimed;
     public DoublePriorityQueue<Row> rows;
 
     public Board(int size){
 
         this.size = size;
         area = size * size;
-        totalScore = 0;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
+        unclaimed = new ArrayList<>();
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = ' ';
         player1 = 'X';
@@ -199,6 +199,7 @@ public class Board{
 
                 Tile tile = new Tile(i, j, this);
                 tiles[i][j] = tile;
+                unclaimed.add(tile);
                 rowTiles[j] = tile;
 
             }
@@ -277,9 +278,12 @@ public class Board{
 
     }
 
-    public int getTotalScore(){ return totalScore; }
-    public void incrementTotalScore(){ totalScore++; }
-    public boolean noMoreTiles(){ return totalScore == area; }
+    public int getTotalScore(){ return area - unclaimed.size(); }
+    public void recordTile(Tile tile){
+        totalScore++;
+        unclaimed.remove(tile);
+    }
+    public boolean noMoreTiles(){ return unclaimed.isEmpty(); }
     public boolean winnable(){ return rows.size() > 0; }
     public boolean gameOver(){ return winner != ' ' || noMoreTiles(); } //game over if winner or no more tiles
 

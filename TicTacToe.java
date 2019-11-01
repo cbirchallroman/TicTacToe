@@ -44,11 +44,11 @@ public class TicTacToe implements ActionListener {
         int playAgain = 10; // playAgain will store the user choice on whether a new game takes place
         Board.Tile tile = tilesDict.get(buttonClicked);
 
-        if(!tile.Open())
+        if(!tile.unclaimed())
             return;
 
         char claim = this.altNum % 2 == 0 ? board.player1 : board.player2;
-        tile.Set(claim);
+        tile.claim(claim);
         buttonClicked.setText(claim + "");
         buttonClicked.setBackground(Color.lightGray);
         altNum++;
