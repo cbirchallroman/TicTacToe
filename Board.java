@@ -191,8 +191,8 @@ public class Board{
         unclaimed = new ArrayList<>();
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = ' ';
-        player1 = 'X';
-        player2 = 'O';
+        player1 = 'O';
+        player2 = 'X';
 
         for(int i = 0; i < size; i ++){
 
@@ -262,7 +262,7 @@ public class Board{
 
         }
 
-        return s + rows.size() + " rows\t[ O: (" + getBestRow('O') + ")\t X: (" + getBestRow('X') + ") ]";
+        return s + rows.size() + " rows\t[ " + player1 + ": (" + getBestRow(player1) + ")\t " + player2 + ": (" + getBestRow(player2) + ") ]";
 
     }
 
