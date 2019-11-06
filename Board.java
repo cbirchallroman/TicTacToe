@@ -67,7 +67,7 @@ public class Board{
             int score = 0;
 
             for(Row row : rows){
-                char other = row.winner();
+                char other = row.claimer;
                 if(other != ' ')
                     continue;
                 if(other != player)
@@ -152,10 +152,11 @@ public class Board{
             absScore++; //increase absolute score by 1
             claimer = player;
 
+            //player1 decreases score, player2 increases
             if(player == board.player1)
-                score++;
-            else
                 score--;
+            else
+                score++;
 
             if(won())
                 board.declareWinner(player);
@@ -261,7 +262,7 @@ public class Board{
 
         }
 
-        return s + rows.size() + " rows\t[ O: (" + rows.peek() + ")\t X: (" + rows.peekLast() + ") ]";
+        return s + rows.size() + " rows\t[ O: (" + getBestRow('O') + ")\t X: (" + getBestRow('X') + ") ]";
 
     }
 
@@ -278,6 +279,14 @@ public class Board{
     void disqualifyRow(Row row){
 
         rows.remove(row);
+
+    }
+
+    Row getBestRow(char player){
+
+        if(player == player1)
+            return rows.peek();
+        return rows.peekLast();
 
     }
 
