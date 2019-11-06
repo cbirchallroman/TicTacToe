@@ -6,9 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Debug (Launch) - Current File",
+            "name": "Play Game",
             "request": "launch",
-            "mainClass": "${file}"
+            "mainClass": "TicTacToe"
         }
     ]
 }
