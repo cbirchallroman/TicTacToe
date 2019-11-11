@@ -12,6 +12,7 @@ public class TicTacToe implements ActionListener {
     int area;
     JButton[][] buttons;
     HashMap<JButton, Board.Tile> tilesDict;
+    HashMap<Board.Tile, JButton> buttonsDict;
 
     public void setButtons() {
 
@@ -29,6 +30,7 @@ public class TicTacToe implements ActionListener {
                 frame.add(buttons[i][j]); // add the buttons to the frame
 
                 tilesDict.put(buttons[i][j], board.getTile(i, j));
+                buttonsDict.put(board.getTile(i, j), buttons[i][j]);
 
             }
         }
@@ -38,42 +40,60 @@ public class TicTacToe implements ActionListener {
         frame.setVisible(true); // make the frame visible
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // if we close the frame, the program ends
     }
+
+    public void claimTile(Board.Tile tile, char player){
+
+        if(!tile.unclaimed())
+            return;
+
+        tile.claim(player);
+        buttonsDict.get(tile).setText(player + "");
+        buttonsDict.get(tile).setBackground(Color.lightGray);
+        altNum++;
+
+        System.out.println(board);
+
+        checkGameOver();
+
+    }
+
     public void actionPerformed(ActionEvent event) { // this has to be implemented
         
         JButton buttonClicked = (JButton) event.getSource(); // get source of clicks, an object will be returned, so casting is needed
-        int playAgain = 10; // playAgain will store the user choice on whether a new game takes place
         Board.Tile tile = tilesDict.get(buttonClicked);
 
         if(!tile.unclaimed())
             return;
 
         char claim = this.altNum % 2 == 0 ? board.player1 : board.player2;
-        tile.claim(claim);
-        buttonClicked.setText(claim + "");
-        buttonClicked.setBackground(Color.lightGray);
-        altNum++;
+        claimTile(tile, claim);
 
-        System.out.println(board);
+    }
 
-        if (board.gameOver()) { // if the game has ended
-              if (board.winner != ' ') { // before reaching 9 moves, someone has won
-                  playAgain = JOptionPane.showConfirmDialog(null, board.winner + " wins! Do you want to play again?", board.winner + "won!", JOptionPane.YES_NO_OPTION);
-              } else {// otherwise the game is a draw
+    public void checkGameOver(){
+
+        if (board.gameOver()) {// if the game has ended
+
+            int playAgain = 10; // playAgain will store the user choice on whether a new game takes place
+
+            if (board.winner != ' ') { // before reaching 9 moves, someone has won
+                playAgain = JOptionPane.showConfirmDialog(null, board.winner + " wins! Do you want to play again?", board.winner + "won!", JOptionPane.YES_NO_OPTION);
+            }
+            else {// otherwise the game is a draw
                 playAgain = JOptionPane.showConfirmDialog(null, " The game is a draw! Do you want to play again?", "Draw!", JOptionPane.YES_NO_OPTION); 
-              }
+            }
 
-              // the user determines if a new game is to take place
-                if(playAgain == JOptionPane.YES_OPTION) {
-                    clearButtons(); // if yes, then the board is cleared for the new game
-                } else {
-                    System.exit(0); // otherwise we exit
-                }
+            // the user determines if a new game is to take place
+            if(playAgain == JOptionPane.YES_OPTION) {
+                clearButtons(); // if yes, then the board is cleared for the new game
+            } else {
+                System.exit(0); // otherwise we exit
+            }
                    
         }
 
-              
-        
     }
+
     public void clearButtons() {
 
         
