@@ -9,7 +9,6 @@ public class TicTacToe implements ActionListener {
     int altNum; // this number enables alternate choices between an 'x' and an 'o' for various clicks
     Board board;
     int size;
-    int area;
     JButton[][] buttons;
     HashMap<JButton, Board.Tile> tilesDict;
     HashMap<Board.Tile, JButton> buttonsDict;
@@ -85,8 +84,9 @@ public class TicTacToe implements ActionListener {
 
             // the user determines if a new game is to take place
             if(playAgain == JOptionPane.YES_OPTION) {
-                clearButtons(); // if yes, then the board is cleared for the new game
-            } else {
+                clearBoard(); // if yes, then the board is cleared for the new game
+            }
+            else {
                 System.exit(0); // otherwise we exit
             }
                    
@@ -94,7 +94,7 @@ public class TicTacToe implements ActionListener {
 
     }
 
-    public void clearButtons() {
+    public void clearBoard() {
 
         
         board = new Board(size);
@@ -114,7 +114,6 @@ public class TicTacToe implements ActionListener {
     public TicTacToe(int size){
 
         this.size = size;
-        area = size * size;
         board = new Board(size);
         altNum = 0;
 
@@ -135,13 +134,17 @@ public class TicTacToe implements ActionListener {
             if (size < 3 || 5 < size) {
                 JOptionPane.showMessageDialog(frame, "The number you entered doesn't satisfy acceptable values. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
                 System.exit(0);
-            } else {
+            }
+            
+            else {
                 TicTacToe aGame = new TicTacToe(size);
                 aGame = new TicTacToe(Integer.parseInt(gridSize));
                 aGame.setButtons();
             }
           
-        } catch (NumberFormatException e) {
+        }
+        
+        catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(frame, "You entered irregular input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
             System.exit(0);
         }       
