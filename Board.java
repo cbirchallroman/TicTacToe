@@ -290,6 +290,12 @@ public class Board{
 
     }
 
+    Row getWorstRow(char player){
+
+        return player == player1 ? getBestRow(player2) : getBestRow(player1);
+
+    }
+
     public int getTotalScore(){ return area - unclaimed.size(); }
     public void recordTile(Tile tile){
         unclaimed.remove(tile);
