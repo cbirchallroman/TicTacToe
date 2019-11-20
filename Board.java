@@ -240,6 +240,7 @@ public class Board{
 
     public Tile getTile(int i, int j){
 
+        System.out.println(i + " " + j + " " + tiles[i][j]);
         return tiles[i][j];
 
     }
@@ -274,7 +275,6 @@ public class Board{
     void declareWinner(char winner){
 
         this.winner = winner;
-        System.out.println("Player " + winner + " wins");
 
     }
 

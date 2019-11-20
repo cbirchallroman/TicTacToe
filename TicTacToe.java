@@ -6,18 +6,24 @@ import java.awt.event.ActionListener;
 import java.util.*; //needed for map
 
 public class TicTacToe implements ActionListener {
-    int altNum; // this number enables alternate choices between an 'x' and an 'o' for various clicks
-    Board board;
-    int size;
-    JButton[][] buttons;
-    HashMap<JButton, Board.Tile> tilesDict;
-    HashMap<Board.Tile, JButton> buttonsDict;
+
+    public static TicTacToe game;
+
+    private int currentTurn; // this number enables alternate choices between an 'x' and an 'o' for various clicks
+    private Board board;
+    private JFrame frame;
+    private int size;
+    private Player[] players;
+    private JButton[][] buttons;
+    private HashMap<JButton, Board.Tile> tilesDict;
+    private HashMap<Board.Tile, JButton> buttonsDict;
 
     public void setButtons() {
 
-        JFrame frame = new JFrame("Tic Tac Toe"); // create a frame for the grid, with a label
+        frame = new JFrame("Tic Tac Toe"); // create a frame for the grid, with a label
         
         frame.setLayout(new GridLayout(size, size)); // make the grid be 3x3, a user choice can change this
+
 
         for(int i = 0; i < size; i ++){
             for(int j = 0; j < size; j++){
@@ -48,11 +54,22 @@ public class TicTacToe implements ActionListener {
         board.recordTile(tile, player);
         buttonsDict.get(tile).setText(player + "");
         buttonsDict.get(tile).setBackground(Color.lightGray);
-        altNum++;
+        if(board.gameOver()){
+            System.out.println(currentPlayer() + " wins!");
+            endGame();
+            return; //don't do another turn
+        }
+        nextTurn();
+
+    }
+
+    private void nextTurn(){
+
+
+        currentTurn = currentTurn == 1 ? 0 : 1;
 
         System.out.println(board);
-
-        checkGameOver();
+        System.out.println("Current player: " + currentPlayer());
 
     }
 
@@ -64,61 +81,56 @@ public class TicTacToe implements ActionListener {
         if(!tile.unclaimed())
             return;
 
-        char claim = this.altNum % 2 == 0 ? board.player1 : board.player2;
+        char claim = this.currentTurn % 2 == 0 ? board.player1 : board.player2;
         claimTile(tile, claim);
 
     }
 
-    public void checkGameOver(){
+    private void endGame(){
 
-        if (board.gameOver()) {// if the game has ended
+        boolean draw = board.winner != ' ';
 
-            int playAgain = 10; // playAgain will store the user choice on whether a new game takes place
+        //different dialogue depending on whether the game was a draw or if there was a winner
+        String message = draw ? "The game is a draw! Do you want to play again?" : board.winner + " wins! Do you want to play again?";
+        String title = draw ? "Draw!" : board.winner + "won!";
 
-            if (board.winner != ' ') { // before reaching 9 moves, someone has won
-                playAgain = JOptionPane.showConfirmDialog(null, board.winner + " wins! Do you want to play again?", board.winner + "won!", JOptionPane.YES_NO_OPTION);
-            }
-            else {// otherwise the game is a draw
-                playAgain = JOptionPane.showConfirmDialog(null, " The game is a draw! Do you want to play again?", "Draw!", JOptionPane.YES_NO_OPTION); 
-            }
+        // playAgain will store the user choice on whether a new game takes place
+        int playAgain = JOptionPane.showConfirmDialog(null, message, title, JOptionPane.YES_NO_OPTION); 
 
-            // the user determines if a new game is to take place
-            if(playAgain == JOptionPane.YES_OPTION) {
-                clearBoard(); // if yes, then the board is cleared for the new game
-            }
-            else {
-                System.exit(0); // otherwise we exit
-            }
-                   
+        // the user determines if a new game is to take place
+        if(playAgain == JOptionPane.YES_OPTION) {
+            frame.dispose();    //close old frame
+            beginGame(size);
+        }
+        else {
+            System.exit(0); // otherwise we exit
         }
 
     }
 
-    public void clearBoard() {
-
-        
-        board = new Board(size);
-
-        for (int i = 0; i < size; i++) {
-            for(int j = 0; j < size; j++){
-                buttons[i][j].setText(" "); // reset the buttons to empty
-                buttons[i][j].setBackground(buttons[i][j].getForeground());
-                tilesDict.put(buttons[i][j], board.getTile(i, j));
-            }
-        }
-
-
-        altNum = 0; // reset altnum to zero
-    }
-
-    public TicTacToe(int size){
+    private TicTacToe(int size){
 
         this.size = size;
         board = new Board(size);
-        altNum = 0;
+        currentTurn = 0;
 
         buttons = new JButton[size][size]; // create an array of size^2 buttons
         tilesDict = new HashMap<>();
+        buttonsDict = new HashMap<>();
+
+        players = new Player[2];
+        players[0] = new Human('O');
+        players[1] = new Human('X');
+
+    }
+
+    public String currentPlayer() { return players[currentTurn].toString(); }
+
+    public static void beginGame(int size){
+
+        game = new TicTacToe(size);
+        game.setButtons();
+        System.out.println("Current player: " + game.currentPlayer());
 
     }
 
@@ -137,9 +149,7 @@ public class TicTacToe implements ActionListener {
             }
             
             else {
-                TicTacToe aGame = new TicTacToe(size);
-                aGame = new TicTacToe(Integer.parseInt(gridSize));
-                aGame.setButtons();
+                beginGame(size);
             }
           
         }
@@ -151,4 +161,54 @@ public class TicTacToe implements ActionListener {
         
     
     }
+
+}
+
+abstract class Player {
+
+    private char marker;
+
+    public abstract void doMove(Board state);
+    public Player(char marker){
+
+        this.marker = marker;
+
+    }
+
+    public String toString(){ return "Player " + marker; }
+
+}
+
+class Human extends Player {
+
+    public Human(char marker) {
+        super(marker);
+    }
+
+    @Override
+    public void doMove(Board state){
+    
+
+
+    }
+
+    public String toString() { return "Human " + super.toString(); }
+
+}
+
+class Computer extends Player {
+
+    public Computer(char marker) {
+        super(marker);
+    }
+
+    @Override
+    public void doMove(Board state){
+
+
+
+    }
+
+    public String toString() { return "Computer " + super.toString(); }
+
 }
