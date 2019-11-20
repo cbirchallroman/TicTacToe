@@ -8,44 +8,44 @@ public class Board{
         private int y;
         private ArrayList<Row> rows;
         private Board board;
-        private char claimer;
+        private char player;
+
+        private int score;
+        private int visits;
+
+
 
         public Tile(int x, int y, Board board){
 
             this.x = x;
             this.y = y;
             this.board = board;
-            claimer = ' ';
+            player = ' ';
             rows = new ArrayList<>();
 
         }
 
-        public boolean unclaimed(){ return claimer == ' ';}
-        public void claim(char status){
+        public boolean unclaimed(){ return player == ' ';}
+        public void claim(char player){
 
             if(!unclaimed())
                 System.out.println("Can't set tile at " + x + " " + y);
 
-            this.claimer = status;
-            board.recordTile(this);
+            this.player = player;
             for(int i = rows.size() - 1; i >= 0; i--){
 
-                Row row = rows.get(i);
-                row.claimTile(status);
+                rows.get(i).claimTile(this);
 
             }
 
         }
-
-        public String coordinates(){
-
-            return x + ", " + y;
-
-        }
+        public char getClaimer(){ return player; }
+        public int getScore() { return score; }
+        public int getVisits() { return visits; }
 
         public String toString(){
 
-            return "[" + claimer + "]";
+            return "[" + player + "]";
 
         }
 
@@ -140,7 +140,9 @@ public class Board{
 
         }
 
-        void claimTile(char player){
+        void claimTile(Tile tile){
+
+            char player = tile.player;
 
             //if the player claiming this tile is not the same player who claimed tiles in this row before,
             //  this row is disqualified
@@ -150,7 +152,7 @@ public class Board{
             }
 
             absScore++; //increase absolute score by 1
-            claimer = player;
+            this.claimer = player;
 
             //player1 decreases score, player2 increases
             if(player == board.player1)
@@ -297,8 +299,9 @@ public class Board{
     }
 
     public int getTotalScore(){ return area - unclaimed.size(); }
-    public void recordTile(Tile tile){
+    public void recordTile(Tile tile, char player){
         unclaimed.remove(tile);
+        tile.claim(player);
     }
     public void updateRow(Row row){
         rows.update(row);

@@ -45,7 +45,7 @@ public class TicTacToe implements ActionListener {
         if(!tile.unclaimed())
             return;
 
-        tile.claim(player);
+        board.recordTile(tile, player);
         buttonsDict.get(tile).setText(player + "");
         buttonsDict.get(tile).setBackground(Color.lightGray);
         altNum++;
