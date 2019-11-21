@@ -1,4 +1,5 @@
 import javax.swing.*; // needed for JFrame, and JButton
+
 import java.awt.*; // needed for GridLayout, and for ActionListener
 
 import java.awt.event.ActionEvent; // these two are needed to sniff mouse clicks
@@ -13,6 +14,7 @@ public class TicTacToe implements ActionListener {
     private Board board;
     private JFrame frame;
     private int size;
+    private boolean pve, first;
     private Player[] players;
     private JButton[][] buttons;
     private HashMap<JButton, Board.Tile> tilesDict;
@@ -46,30 +48,53 @@ public class TicTacToe implements ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // if we close the frame, the program ends
     }
 
-    public void claimTile(Board.Tile tile, char player){
+    public void claimTile(Board.Tile tile, Player player){
 
+        //if tile is claimed already, don't proceed
         if(!tile.unclaimed())
             return;
 
-        board.recordTile(tile, player);
-        buttonsDict.get(tile).setText(player + "");
+        //get marker of claimant
+        char marker = player.getMarker();
+
+        //record claim in board structure
+        board.recordTile(tile, marker);
+
+        //change appearance of tile
+        buttonsDict.get(tile).setText(marker + "");
         buttonsDict.get(tile).setBackground(Color.lightGray);
+
+        //if game is over, end game and don't do another turn
         if(board.gameOver()){
-            System.out.println(currentPlayer() + " wins!");
             endGame();
-            return; //don't do another turn
+            return; 
         }
+
+        //proceed to next turn
         nextTurn();
 
     }
 
     private void nextTurn(){
 
-
+        //increment
         currentTurn = currentTurn == 1 ? 0 : 1;
 
+        //print board status
         System.out.println(board);
-        System.out.println("Current player: " + currentPlayer());
+
+        //if current player is computer, process its turn
+        Player player = currentPlayer();
+        if(!player.getManual())
+            computerTurn(player);
+        else
+            System.out.println("Waiting for " + player + "'s turn...");
+
+    }
+
+    private void computerTurn(Player player){
+
+        System.out.println(player + " is doing their turn...");
 
     }
 
@@ -77,18 +102,19 @@ public class TicTacToe implements ActionListener {
         
         JButton buttonClicked = (JButton) event.getSource(); // get source of clicks, an object will be returned, so casting is needed
         Board.Tile tile = tilesDict.get(buttonClicked);
+        Player player = currentPlayer();
 
-        if(!tile.unclaimed())
+        //if the tile has been claimed or the current player does not use manual input, do not proceed
+        if(!tile.unclaimed() || !player.getManual())
             return;
-
-        char claim = this.currentTurn % 2 == 0 ? board.player1 : board.player2;
-        claimTile(tile, claim);
+        
+        claimTile(tile, player);
 
     }
 
     private void endGame(){
 
-        boolean draw = board.winner != ' ';
+        boolean draw = board.winner == ' ';
 
         //different dialogue depending on whether the game was a draw or if there was a winner
         String message = draw ? "The game is a draw! Do you want to play again?" : board.winner + " wins! Do you want to play again?";
@@ -100,7 +126,7 @@ public class TicTacToe implements ActionListener {
         // the user determines if a new game is to take place
         if(playAgain == JOptionPane.YES_OPTION) {
             frame.dispose();    //close old frame
-            beginGame(size);
+            userConfig();
         }
         else {
             System.exit(0); // otherwise we exit
@@ -108,107 +134,121 @@ public class TicTacToe implements ActionListener {
 
     }
 
-    private TicTacToe(int size){
-
-        this.size = size;
-        board = new Board(size);
-        currentTurn = 0;
-
-        buttons = new JButton[size][size]; // create an array of size^2 buttons
-        tilesDict = new HashMap<>();
-        buttonsDict = new HashMap<>();
-
-        players = new Player[2];
-        players[0] = new Human('O');
-        players[1] = new Human('X');
-
-    }
-
-    public String currentPlayer() { return players[currentTurn].toString(); }
-
-    public static void beginGame(int size){
-
-        game = new TicTacToe(size);
-        game.setButtons();
-        System.out.println("Current player: " + game.currentPlayer());
-
-    }
-
     public static void main(String[] args) {
+
+        userConfig();
+        
+    }
+
+    public static void userConfig(){
 
         JFrame frame = new JFrame();
         
         try {
             
-            String gridSize = JOptionPane.showInputDialog(frame, "Enter the size of the grid (3, 4 or 5 accepted): ");
-            int size = Integer.parseInt(gridSize);
-          
-            if (size < 3 || 5 < size) {
+            //ask what size of board to use
+            int size = Integer.parseInt(JOptionPane.showInputDialog(frame, "Enter the size of the grid (3, 4 or 5 accepted): "));
+            if(size < 3 || 5 < size) {
                 JOptionPane.showMessageDialog(frame, "The number you entered doesn't satisfy acceptable values. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
                 System.exit(0);
+                return;
+            }
+
+            //ask whether to play against computer or not
+            char opt = JOptionPane.showInputDialog(frame, "Do you want to play against the computer? (y/n): ").charAt(0);
+            boolean pve = opt == 'y' || opt == 'Y';
+
+            //only show option to move first if playing against the computer
+            boolean first = false;
+            if(pve){
+                opt = JOptionPane.showInputDialog(frame, "Do you want to move first? (y/n): ").charAt(0);
+                first = opt == 'y' || opt == 'Y';
             }
             
-            else {
-                beginGame(size);
-            }
+            //begin game with these parameters
+            beginGame(size, pve, first);
           
         }
         
+        //if Integer.parseInt() fails
         catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(frame, "You entered irregular input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
             System.exit(0);
-        }       
+        }
         
+        //if String.getChar() fails
+        catch (IndexOutOfBoundsException e) {
+            JOptionPane.showMessageDialog(frame, "You didn't write any input. Goodbye!", "Alert", JOptionPane.WARNING_MESSAGE);
+            System.exit(0);
+        }
+
+    }
+
+    public static void beginGame(int size, boolean pve, boolean first){
+
+        game = new TicTacToe(size, pve, first);
+        game.setButtons();
+
+    }
+
+    private TicTacToe(int size, boolean pve, boolean first){
+
+        this.size = size;
+        this.pve = pve;
+        this.first = first;
+        board = new Board(size);
+        currentTurn = 1;    //begin at 1 so we can call nextTurn() and have Turn 0
+
+        buttons = new JButton[size][size]; // create an array of size^2 buttons
+        tilesDict = new HashMap<>();
+        buttonsDict = new HashMap<>();
+
+        instantiatePlayers();
+
+        nextTurn();
+
+    }
+
+    private void instantiatePlayers(){
+
+        //create array of 2 players
+        players = new Player[2];
+
+        //assume that O and X will be used as markers
+        char marker0 = 'O';
+        char marker1 = 'X';
+
+        //first player is computer if pve == true and first == false
+        players[0] = new Player(marker0, !(pve == true && first == false), this);
+
+        //second player is computer if pve == true and first == true
+        players[1] = new Player(marker1, !(pve == true && first == true), this);
+        
+        //send markers to board
+        board.setPlayers(marker0, marker1);
+
+    }
+
+    public Player currentPlayer() { return players[currentTurn]; }
+
+    class Player {
+    
+        protected TicTacToe game;
+        protected char marker;
+        protected boolean manual;
+    
+        public char getMarker() { return marker; }
+        public boolean getManual() { return manual; }
+        public String toString(){ return "Player " + marker; }
+    
+        public Player(char marker, boolean manual, TicTacToe game){
+    
+            this.marker = marker;   //'X' or 'O' or whatever
+            this.manual = manual;   //whether this takes human input or computer input
+            this.game = game;
+    
+        }
     
     }
-
-}
-
-abstract class Player {
-
-    private char marker;
-
-    public abstract void doMove(Board state);
-    public Player(char marker){
-
-        this.marker = marker;
-
-    }
-
-    public String toString(){ return "Player " + marker; }
-
-}
-
-class Human extends Player {
-
-    public Human(char marker) {
-        super(marker);
-    }
-
-    @Override
-    public void doMove(Board state){
-    
-
-
-    }
-
-    public String toString() { return "Human " + super.toString(); }
-
-}
-
-class Computer extends Player {
-
-    public Computer(char marker) {
-        super(marker);
-    }
-
-    @Override
-    public void doMove(Board state){
-
-
-
-    }
-
-    public String toString() { return "Computer " + super.toString(); }
 
 }

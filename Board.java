@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class Board{
 
@@ -26,6 +28,7 @@ public class Board{
         }
 
         public boolean unclaimed(){ return player == ' ';}
+
         public void claim(char player){
 
             if(!unclaimed())
@@ -83,13 +86,14 @@ public class Board{
     class Row implements Comparable<Row>{
 
         Board board;
-        private Tile[] tiles;
+        private ArrayList<Tile> tiles;
         private int score, absScore, target;
         public char claimer = ' ';
 
         public Row(Tile[] tiles, Board board){
 
-            this.tiles = tiles;
+            this.tiles = new ArrayList<>();
+            Collections.addAll(this.tiles, tiles);
             this.board = board;
             score = 0; //negative if more O, positive if more X
             absScore = 0; //total number of tiles claimed
@@ -155,14 +159,18 @@ public class Board{
             this.claimer = player;
 
             //player1 decreases score, player2 increases
-            if(player == board.player1)
+            if(player == board.player0)
                 score--;
             else
                 score++;
 
+            //if this was a winning move, declare a winner
             if(won())
                 board.declareWinner(player);
-            board.updateRow(this);
+
+            board.updateRow(this);  //update row's standing among the other rows
+            tiles.remove(tile);     //remove claimed tile from list of tiles in this row
+            tile.leaveRow(this);    //and do the same from the tile's end
 
         }
 
@@ -172,6 +180,7 @@ public class Board{
                 tile.leaveRow(this);
 
             board.disqualifyRow(this);
+
         }
 
     }
@@ -179,22 +188,27 @@ public class Board{
     private int size;
     private int area;
     public char winner;
+    public char player0;
     public char player1;
-    public char player2;
     public Tile[][] tiles;
     public ArrayList<Tile> unclaimed;
     public DoublePriorityQueue<Row> rows;
+
+    public void setPlayers(char player0, char player1){
+
+        this.player0 = player0;
+        this.player1 = player1;
+
+    }
 
     public Board(int size){
 
         this.size = size;
         area = size * size;
         tiles = new Tile[size][size];   //board of size 3 has 9 tiles
-        unclaimed = new ArrayList<>();
+        unclaimed = new ArrayList<>(area);
         rows = new DoublePriorityQueue<>();   //board of size 3 has 8 winning combinations
         winner = ' ';
-        player1 = 'O';
-        player2 = 'X';
 
         for(int i = 0; i < size; i ++){
 
@@ -232,7 +246,6 @@ public class Board{
             diagonal_a[k] = tiles[k][k];
             diagonal_b[k] = tiles[k][opposite];
         }
-
         rows.add(new Row(diagonal_a, this));
         rows.add(new Row(diagonal_b, this));
 
@@ -265,13 +278,11 @@ public class Board{
 
         }
 
-        return s + rows.size() + " rows\t[ " + player1 + ": (" + getBestRow(player1) + ")\t " + player2 + ": (" + getBestRow(player2) + ") ]";
+        return s + rows.size() + " rows\t[ " + player0 + ": (" + getBestRow(player0) + ")\t " + player1 + ": (" + getBestRow(player1) + ") ]";
 
     }
 
-    //returns O if O wins
-    //returns X if X wins
-    //returns blank if no winner
+    //declare the winner here
     void declareWinner(char winner){
 
         this.winner = winner;
@@ -286,7 +297,7 @@ public class Board{
 
     Row getBestRow(char player){
 
-        if(player == player1)
+        if(player == player0)
             return rows.peek();
         return rows.peekLast();
 
@@ -294,7 +305,7 @@ public class Board{
 
     Row getWorstRow(char player){
 
-        return player == player1 ? getBestRow(player2) : getBestRow(player1);
+        return player == player0 ? getBestRow(player1) : getBestRow(player0);
 
     }
 
